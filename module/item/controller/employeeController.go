@@ -19,7 +19,6 @@ func Transfer(c *gin.Context) (int, error) {
 	}
 	return id, nil
 }
-
 func GetUsers(c *gin.Context) {
 	employees, err := business.FetchUsers()
 	if err != nil {

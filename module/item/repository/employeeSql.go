@@ -1,30 +1,12 @@
 package repository
 
 import (
-	"database/sql"
-	"fmt"
-	"log"
 	apimodel "test3/module/item/model"
 	"time"
 
 	_ "github.com/lib/pq"
 )
 
-const (
-	host     = "localhost"
-	port     = 5432
-	user     = "postgres"
-	password = "091372"
-	dbname   = "Users"
-)
-
-func ConnectDB() (*sql.DB, error) {
-	db, err := sql.Open("postgres", fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname))
-	if err != nil {
-		log.Fatal("Error connecting to the database: ", err)
-	}
-	return db, err
-}
 func ReadEmployee(id int) (apimodel.Employee, error) {
 	var e apimodel.Employee
 	db, err := ConnectDB()
@@ -61,19 +43,6 @@ func ReadAllEmployee() ([]apimodel.Employee, error) {
 	return employees, nil
 }
 
-func FindUsername(username string) (int, error) {
-	var id int
-	db, err := ConnectDB()
-	if err != nil {
-		return -1, err
-	}
-	err = db.QueryRow("SELECT id  FROM Account WHERE username=$1", username).Scan(&id)
-	if err != nil {
-		return -1, err
-	}
-	return id, nil
-}
-
 func CreateEmployee(name string, dob time.Time, email string, phone string, citizenId string, address string) (int, error) {
 	var id int
 	db, err := ConnectDB()
@@ -81,18 +50,6 @@ func CreateEmployee(name string, dob time.Time, email string, phone string, citi
 		return 0, err
 	}
 	err = db.QueryRow("INSERT INTO Employee(name, dob, email, phone, citizenId, address) VALUES($1, $2,$3,$4,$5,$6) RETURNING id", name, dob, email, phone, citizenId, address).Scan(&id)
-	if err != nil {
-		return 0, err
-	}
-	return id, nil
-}
-func CreateAccount(username string, password string, employeeId int, role int) (int, error) {
-	var id int
-	db, err := ConnectDB()
-	if err != nil {
-		return 0, err
-	}
-	err = db.QueryRow("INSERT INTO Account(username, password,employeeId, role) VALUES($1, $2,$3,$4) RETURNING id", username, password, employeeId, role).Scan(&id)
 	if err != nil {
 		return 0, err
 	}
@@ -111,19 +68,6 @@ func UpdateEmployee(id int, name string, dob time.Time, email string, phone stri
 	return id, nil
 }
 
-func UpdatePassword(id int, password string) (bool, error) {
-	db, err := ConnectDB()
-	if err != nil {
-		return false, err
-	}
-	_, err = db.Exec("UPDATE Account SET password=$2 WHERE id=$1", id, password)
-
-	if err != nil {
-		return false, err
-	}
-	return true, nil
-}
-
 func DeleteEmployee(id int) (int, error) {
 	db, err := ConnectDB()
 	if err != nil {
@@ -134,15 +78,4 @@ func DeleteEmployee(id int) (int, error) {
 		return -1, err
 	}
 	return id, nil
-}
-func DeleteAccount(employeeId int) (int, error) {
-	db, err := ConnectDB()
-	if err != nil {
-		return 0, err
-	}
-	_, err = db.Exec("DELETE FROM ACCOUNT WHERE employeeId=$1", employeeId)
-	if err != nil {
-		return -1, err
-	}
-	return employeeId, nil
 }
