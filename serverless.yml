@@ -1,0 +1,43 @@
+service: myservice
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: provided.al2023
+
+package:
+  patterns:
+    - '!./**'
+    - ./bin/**
+
+functions:
+  getEmployee:
+    handler: bin/main
+    events:
+      - http:
+          path: employee/:id
+          method: get
+  getEmployees:
+    handler: bin/main
+    events:
+      - http:
+          path: employees
+          method: get
+  createEmployee:
+    handler: bin/main
+    events:
+      - http:
+          path: employee/:id
+          method: post
+  deleteEmployee:
+    handler: bin/main
+    events:
+      - http:
+          path: employee/:id
+          method: delete
+  updateEmployee:
+    handler: bin/main
+    events:
+      - http:
+          path: employee/:id
+          method: put
